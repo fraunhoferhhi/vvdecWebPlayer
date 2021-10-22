@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="lib/bootstrap.min.css" rel="stylesheet">
+  <link href="lib/bootstrap-icons.css" rel="stylesheet">
+  <title>VVdeC Web Player Demo</title>
+  <style type="text/css">
+    #canvas {
+      background-image: url("img/VVC_vertical.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 200px;
+      background-color: white !important;
+    }
+
+    .logoBadge {
+      height: 100px;
+      width: 320px;
+      padding: 8px;
+    }
+
+    .logoBadge>div {
+      font-size: 28px;
+    }
+
+    .logoBadge>div>.bi-github {
+      font-size: 42px;
+    }
+
+    .progressContainer {
+      position: relative;
+      height: 8px;
+      padding-top: 5px;
+      margin-top: -5px;
+    }
+
+    /*
+    disabled for now, because it suggests seeking is possible
+     .progressContainer:hover {
+      padding-top: 0px;
+    } */
+
+  </style>
+</head>
+
+<body class="bg-light">
+  <!-- ------------ header bar ------------ -->
+  <header class="bg-dark bg-gradient text-light navbar navbar-dark border-bottom px-4">
+    <div class="navbar-brand d-flex gap-2">
+      <img class="align-self-center" src="img/Logo_FHG_cube_only.svg" style="height: 1.6rem;">
+      <span class="fs-4">VVdeC Web Player Demo</span>
+    </div>
+    <div class="d-inline-flex">
+      <select class="form-select lh-1" id="selectBitstream">
+        <!--
+        <option selected>/VTM-10.0/RA/ClassB/RA_Cactus_QP37.266</option>
+        <option>/VTM-10.0/RA/ClassB/RA_BasketballDrive_QP22.266</option>
+        <option>/VTM-10.0/RA/ClassF/RA_ArenaOfValor_QP37.mp4</option>
+        <option>vvc.mp4</option>
+        <option>/ext/bitstreams/AMVR_B_HHI_3/AMVR_B_HHI_3.bit</option>
+        -->
+      </select>
+      <button id="btnDownload" type="button" title="download bitstream"
+        class="btn btn-sm btn-light-border border text-light bi bi-download"></button>
+      <label hidden for="repeat">Repeat:</label>
+      <input hidden id="repeat" type="number" min="0" value="5" style="width: 5em;">
+      <label hidden for="selectFPS">fps:</label>
+      <select hidden id="selectFPS">
+        <option>25</option>
+        <option>30</option>
+        <option selected>50</option>
+        <option>60</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <!-- ------------ the player ------------ -->
+    <div class="container-fluid d-flex flex-column bg-secondary pt-2">
+
+      <div class="m-1" style="position: absolute;">
+        <h1 id="videoTitle" class="d-inline-box text-light">&nbsp;</h1>
+      </div>
+
+      <figure class="mx-auto bg-black rounded p-3" style="margin-top: 5rem; margin-bottom: 5rem;">
+        <canvas id="canvas" class="img-fluid bg-dark d-block" style="width: 800px;"></canvas>
+        <div class="progressContainer">
+          <div class="progress rounded-0 bg-black h-100">
+            <div id="progress" class="progress-bar" role="progressbar" style="width: 0%; transition: none;"></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-2 gap-3">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+              <button id="btnPlay" type="button" class="btn btn-light btn-sm border bi bi-play-fill" disabled></button>
+              <button id="btnStop" type="button" class="btn btn-light btn-sm border bi bi-stop-fill" disabled></button>
+            </div>
+          </div>
+
+          <div class="align-self-center text-light">
+            <span id="statusResolution"></span>
+            <span id="statusFPS"></span>
+            <span id="status"><span>
+          </div>
+          <img class="ms-auto overflow-hidden" style="width: 100px;" src="img/VVC-horizontal-White.svg">
+        </div>
+      </figure>
+
+      <div class="ms-auto">
+        <button class="border border-bottom-0 border-dark rounded-top px-3 bg-light text-secondary"
+          data-bs-toggle="collapse" data-bs-target="#collapseContainer">advanced</button>
+      </div>
+
+    </div>
+
+    <!-- ------------ log and advanced settings output ------------ -->
+    <div class="container-fluid collapse p-5 pb-0" id="collapseContainer">
+      <div class="card" style="width: 24em;">
+        <div class="card-body">
+          <h5 class="card-title">Benchmarking options</h5>
+          <div class="px-3">
+            <div class="form-check">
+              <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkIgnoreFPS"
+                title="Ignore the FPS read from the file metadata.">
+              <label class="form-check-label disabledDuringPlayback" for="checkIgnoreFPS">Playback as fast as
+                possible</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkNoOutput"
+                title="For benchmarking the decoder, when the browser WebGL performance is low.">
+              <label class="form-check-label disabledDuringPlayback" for="checkNoOutput">Disable video output</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <textarea id="output" class="form-control mt-3" rows="24" spellcheck="false" readonly="true" disabled></textarea>
+    </div>
+
+    <!-- ------------ link badges ------------ -->
+    <div class="container-fluid d-flex flex-wrap gap-5 p-5">
+      <a href="https://github.com/fraunhoferhhi/vvdec" target="_blank"
+        class="mw-100 link-secondary text-decoration-none">
+        <div class="logoBadge img-thumbnail border shadow">
+          <div class="d-flex overflow-hidden justify-content-center align-items-center h-100">
+            <div class="bi bi-github me-2"></div>VVdeC @ github
+          </div>
+        </div>
+      </a>
+      <a href="https://www.hhi.fraunhofer.de/en/departments/vca/technologies-and-solutions/h266-vvc.html"
+        target="_blank" class="mw-100">
+        <img src="img/Logo_Fraunhofer_HHI.svg" class="logoBadge img-thumbnail border shadow"></a>
+      <a href="https://www.mc-if.org/versatile-video-coding/" target="_blank" class="mw-100">
+        <img src="img/VVC_horizontal.svg" class="logoBadge img-thumbnail border shadow"></a>
+    </div>
+  </main>
+
+  <!-- ------------ error/warning popups ------------ -->
+  <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <template id="toastTemplate">
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <div class="bi bi-exclamation-triangle-fill text-warning me-2"></div>
+          <strong class="me-auto">Warning</strong>
+          <!-- <small>11 mins ago</small> -->
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <script type="text/javascript" src="lib/bootstrap.min.js"></script>
+  <script type="text/javascript" src="lib/three.min.js"></script>
+  <script type="text/javascript" src="shell.js"></script>
+</body>
+
+</html>
