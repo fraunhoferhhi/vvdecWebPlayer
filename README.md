@@ -32,9 +32,9 @@ Also, the site must be accessed using HTTPS, if not running on localhost.
 ## Limitations
 
 * The player currently does not have support for playing audio.
-* Playing UHD content is not possible due to the 32 Bit memory limitation of WebAssembly.
 * Performance depends on the browser and platform. At the time of writing Chrome and Edge work best.
-* Safari currently does not provide WebAssebly support (Oct. 2021).
+* Safari currently does not provide multithreading support for WebAssembly (Oct. 2021).
+* (UHD decoding works in principle using VVdeC > 1.3.0, but is probably too slow for practical purposes.)
 
 ## License
 
