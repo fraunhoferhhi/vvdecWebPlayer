@@ -13,15 +13,13 @@ const planeAllocations = [];    // cache for locally allocated planes.
 function sleep(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
-function printOut(text) {
-  if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+function printOut(text, noNewLine) {
   console.log(text);
-  postMessage({ "cmd": "out", "text": text });
+  postMessage({ "cmd": "out", "text": text, "noNewLine": noNewLine });
 }
-function printErr(text) {
-  if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+function printErr(text, noNewLine) {
   console.warn(text);
-  postMessage({ "cmd": "err", "text": text });
+  postMessage({ "cmd": "err", "text": text, "noNewLine": noNewLine });
 }
 
 async function processFrame(frame, timescale, cts_offset) {
@@ -158,7 +156,7 @@ async function decoderRun(bitstreamUrl, repeat) {
     printOut("bitstream already fetched.");
   }
   else {
-    printOut("fetching bitstream...");
+    printOut(`fetching bitstream (${bitstreamUrl})... `, true);
 
     const response = await new Promise(
       (resolve, reject) => {
@@ -306,7 +304,9 @@ function decodeMP4(decInstance, data, repeat) {
       fps: vidTrack.timescale / (vidTrack.samples_duration / vidTrack.nb_samples),
       numFrames: vidTrack.nb_samples,
       duration: vidTrack.samples_duration / vidTrack.timescale,
-      movie_duration: info.duration / info.timescale
+      movie_duration: info.duration / info.timescale,
+      width: vidTrack.track_width,
+      height: vidTrack.track_height
     };
     postMessage(msg);
 

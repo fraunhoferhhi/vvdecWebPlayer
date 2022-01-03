@@ -34,7 +34,7 @@
       position: relative;
       height: 8px;
       padding-top: 5px;
-      margin-top: -5px;
+      margin-top: -8px;
     }
 
     /*
@@ -67,13 +67,6 @@
         class="btn btn-sm btn-light-border border text-light bi bi-download"></button>
       <label hidden for="repeat">Repeat:</label>
       <input hidden id="repeat" type="number" min="0" value="5" style="width: 5em;">
-      <label hidden for="selectFPS">fps:</label>
-      <select hidden id="selectFPS">
-        <option>25</option>
-        <option>30</option>
-        <option selected>50</option>
-        <option>60</option>
-      </select>
     </div>
   </header>
 
@@ -88,7 +81,7 @@
       <figure class="mx-auto bg-black rounded p-3" style="margin-top: 5rem; margin-bottom: 5rem;">
         <canvas id="canvas" class="img-fluid bg-dark d-block" style="width: 800px;"></canvas>
         <div class="progressContainer">
-          <div class="progress rounded-0 bg-black h-100">
+          <div class="progress rounded-0 bg-black h-100" style="--bs-bg-opacity: 0.3; visibility: hidden;">
             <div id="progress" class="progress-bar" role="progressbar" style="width: 0%; transition: none;"></div>
           </div>
         </div>
@@ -102,8 +95,6 @@
           </div>
 
           <div class="align-self-center text-light">
-            <span id="statusResolution"></span>
-            <span id="statusFPS"></span>
             <span id="status"><span>
           </div>
           <img class="ms-auto overflow-hidden" style="width: 100px;" src="img/VVC-horizontal-White.svg">
@@ -119,26 +110,49 @@
 
     <!-- ------------ log and advanced settings output ------------ -->
     <div class="container-fluid collapse p-5 pb-0" id="collapseContainer">
-      <div class="card" style="width: 24em;">
-        <div class="card-body">
-          <h5 class="card-title">Benchmarking options</h5>
-          <div class="px-3">
-            <div class="form-check">
-              <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkIgnoreFPS"
-                title="Ignore the FPS read from the file metadata.">
-              <label class="form-check-label disabledDuringPlayback" for="checkIgnoreFPS">Playback as fast as
-                possible</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkNoOutput"
-                title="For benchmarking the decoder, when the browser WebGL performance is low.">
-              <label class="form-check-label disabledDuringPlayback" for="checkNoOutput">Disable video output</label>
+
+      <div class="d-flex flex-wrap gap-4">
+
+        <div class="card flex-grow-1" style="width: 24em;">
+          <div class="card-body">
+            <h5 class="card-title">Benchmarking options</h5>
+            <div class="px-3">
+              <div class="form-check">
+                <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkIgnoreFPS"
+                  title="Ignore the FPS read from the file metadata.">
+                <label class="form-check-label disabledDuringPlayback" for="checkIgnoreFPS">Playback as fast as
+                  possible</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkNoOutput"
+                  title="For benchmarking the decoder, when the browser WebGL performance is low.">
+                <label class="form-check-label disabledDuringPlayback" for="checkNoOutput">Disable video output</label>
+              </div>
             </div>
           </div>
         </div>
+
+        <div class="card flex-grow-1" style="width: 24em;">
+          <div class="card-body">
+            <h5 class="card-title">Demo Options</h5>
+            <div class="px-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkFixedSize" checked
+                  title="Keep the display size fixed on resolution switches.">
+                <label class="form-check-label" for="checkFixedSize">Use track max video size</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkLoopPlayback"
+                  title="Loop over sequences">
+                <label class="form-check-label" for="checkLoopPlayback">Loop over sequences</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <textarea id="output" class="form-control mt-3" rows="24" spellcheck="false" readonly="true" disabled></textarea>
+      <textarea id="output" class="form-control mt-4" rows="24" spellcheck="false" readonly="true" disabled></textarea>
     </div>
 
     <!-- ------------ link badges ------------ -->
