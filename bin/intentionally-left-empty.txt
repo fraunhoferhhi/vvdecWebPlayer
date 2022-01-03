@@ -1,0 +1,7 @@
+Put the compiled WebAssembly and supporting JavaScript files in this directory:
+
+  vvdecapp.js
+  vvdecapp.wasm
+  vvdecapp.worker.js
+
+see README.md how to build them
