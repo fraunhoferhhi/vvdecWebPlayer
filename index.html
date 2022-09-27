@@ -43,6 +43,40 @@
       padding-top: 0px;
     } */
 
+    .inlineFormInput {
+      display: block;
+      min-height: 1.5rem;
+      padding-left: 1.5em;
+      margin-bottom: 0.125rem;
+    }
+
+    .inlineFormInput>.form-control:disabled,
+    .inlineFormInput>.form-control:disabled~label {
+      pointer-events: none;
+      filter: none;
+      opacity: 0.5;
+      background-color: var(--bs-white);
+    }
+
+    .inlineFormInput>input {
+      float: left;
+      width: var(--width);
+      height: 1.25em;
+      margin-top: 0.125em;
+      margin-left: calc(-0.5em - var(--width));
+      padding: 0% 0.1em;
+      vertical-align: unset;
+      text-align: right;
+    }
+
+    .inlineFormInput>input:invalid {
+      color: #212529;
+      background-color: #fff;
+      outline: 0;
+      border-color: rgba(220, 53, 69);
+      box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
   </style>
 </head>
 
@@ -56,6 +90,7 @@
     <div class="d-inline-flex">
       <select class="form-select lh-1" id="selectBitstream">
         <!--
+        <option>/openGOP/BodeMuseum_1920x1080_60fps_3mbit_1sRA_concat.mp4</option>
         <option selected>/VTM-10.0/RA/ClassB/RA_Cactus_QP37.266</option>
         <option>/VTM-10.0/RA/ClassB/RA_BasketballDrive_QP22.266</option>
         <option>/VTM-10.0/RA/ClassF/RA_ArenaOfValor_QP37.mp4</option>
@@ -63,10 +98,10 @@
         <option>/ext/bitstreams/AMVR_B_HHI_3/AMVR_B_HHI_3.bit</option>
         -->
       </select>
-      <button id="btnDownload" type="button" title="download bitstream"
-        class="btn btn-sm btn-light-border border text-light bi bi-download"></button>
+      <a id="btnDownload" type="button" title="download bitstream"
+        class="btn btn-sm btn-light-border border text-light bi bi-download"></a>
       <label hidden for="repeat">Repeat:</label>
-      <input hidden id="repeat" type="number" min="0" value="5" style="width: 5em;">
+      <input hidden id="repeat" type="number" min="0" value="1" style="width: 5em;">
     </div>
   </header>
 
@@ -79,10 +114,16 @@
       </div>
 
       <figure class="mx-auto bg-black rounded p-3" style="margin-top: 5rem; margin-bottom: 5rem;">
-        <canvas id="canvas" class="img-fluid bg-dark d-block" style="width: 800px;"></canvas>
-        <div class="progressContainer">
-          <div class="progress rounded-0 bg-black h-100" style="--bs-bg-opacity: 0.3; visibility: hidden;">
-            <div id="progress" class="progress-bar" role="progressbar" style="width: 0%; transition: none;"></div>
+        <div id="videoWrapper">
+          <canvas id="canvas" class="img-fluid bg-dark d-block" style="width: 800px;"></canvas>
+
+          <div class="progressContainer">
+            <div class="progress rounded-0 bg-black h-100 position-relative" style="--bs-bg-opacity: 0.3;" hidden>
+              <div id="downloadProgress" class="progress-bar position-absolute h-100 opacity-50" role="progressbar"
+                style="width: 0%; transition: none;"></div>
+              <div id="progress" class="progress-bar position-absolute h-100" role="progressbar"
+                style="width: 0%; transition: none;"></div>
+            </div>
           </div>
         </div>
 
@@ -97,7 +138,24 @@
           <div class="align-self-center text-light">
             <span id="status"><span>
           </div>
-          <img class="ms-auto overflow-hidden" style="width: 100px;" src="img/VVC-horizontal-White.svg">
+          <div class="ms-auto"></div>
+
+          <div class="align-self-center text-light">
+            <span id="actRendition"></span>
+          </div>
+
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+              <button id="btnDecRend" type="button" class="btn btn-light btn-sm border" hidden>
+                <span class="bi bi-caret-down-fill d-inline-block" style="transform: translateY(0.1em);"></span>
+              </button>
+              <button id="btnIncRend" type="button" class="btn btn-light btn-sm border" hidden>
+                <span class="bi bi-caret-up-fill d-inline-block" style="transform: translateY(-0.1em);"></span>
+              </button>
+            </div>
+          </div>
+
+          <img class="overflow-hidden" style="width: 100px;" src="img/VVC-horizontal-White.svg">
         </div>
       </figure>
 
@@ -111,7 +169,14 @@
     <!-- ------------ log and advanced settings output ------------ -->
     <div class="container-fluid collapse p-5 pb-0" id="collapseContainer">
 
-      <div class="d-flex flex-wrap gap-4">
+      <div class="card mw-100 w-100">
+        <div class="card-body pb-0">
+          <h5 class="card-title">Bit Rate</h5>
+          <div id="plotContainer"></div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-4 mt-4">
 
         <div class="card flex-grow-1" style="width: 24em;">
           <div class="card-body">
@@ -120,13 +185,18 @@
               <div class="form-check">
                 <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkIgnoreFPS"
                   title="Ignore the FPS read from the file metadata.">
-                <label class="form-check-label disabledDuringPlayback" for="checkIgnoreFPS">Playback as fast as
-                  possible</label>
+                <label class="form-check-label" for="checkIgnoreFPS">Playback as fast as possible</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input disabledDuringPlayback" type="checkbox" value="" id="checkNoOutput"
                   title="For benchmarking the decoder, when the browser WebGL performance is low.">
-                <label class="form-check-label disabledDuringPlayback" for="checkNoOutput">Disable video output</label>
+                <label class="form-check-label" for="checkNoOutput">Disable video output</label>
+              </div>
+              <div class="inlineFormInput">
+                <input class="form-control disabledDuringPlayback" type="text" value="10" id="inputNumThreads"
+                  maxlength="2" placeholder="-1" pattern="-1|[0-9]+" style="--width: 1.5em;"
+                  title="Number of decoder threads">
+                <label class="form-control-label" for="inputNumThreads">Number of decoder threads</label>
               </div>
             </div>
           </div>
@@ -191,8 +261,10 @@
   </div>
 
   <script type="text/javascript" src="lib/bootstrap.min.js"></script>
-  <script type="text/javascript" src="lib/three.min.js"></script>
-  <script type="text/javascript" src="shell.js"></script>
+  <link rel="stylesheet" href="lib/uPlot.min.css">
+  <script type="text/javascript" src="lib/mpd-parser.js"></script>
+  <script type="text/javascript" src="AsyncHelpers.js"></script>
+  <script type="module" src="shell.mjs"></script>
 </body>
 
 </html>

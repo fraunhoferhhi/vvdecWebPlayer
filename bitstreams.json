@@ -1,5 +1,6 @@
 [
   "dummy_raw_bitstream.266",
   "dummy_packaged_bitstream.mp4",
+  "dummy_DASH_manifest.mpd",
   ["dummy_file_w_title.mp4", "Title to be displayed"]
 ]
