@@ -13,13 +13,16 @@ class CORSRequestHandler (SimpleHTTPRequestHandler):
 # ensure proper mime types are set for all used file-types
 # (see issue #2 https://github.com/fraunhoferhhi/vvdecWebPlayer/issues/2#issuecomment-1049816809)
 CORSRequestHandler.extensions_map['.js']    = 'application/javascript'
+CORSRequestHandler.extensions_map['.mjs']   = 'application/javascript'
 CORSRequestHandler.extensions_map['.json']  = 'application/json'
 CORSRequestHandler.extensions_map['.wasm']  = 'application/wasm'
 CORSRequestHandler.extensions_map['.css']   = 'text/css'
 CORSRequestHandler.extensions_map['.svg']   = 'image/svg+xml'
 CORSRequestHandler.extensions_map['.png']   = 'image/png'
 CORSRequestHandler.extensions_map['.woff2'] = 'font/woff2'
-
+CORSRequestHandler.extensions_map['.mpd']   = 'application/dash+xml'
+CORSRequestHandler.extensions_map['.mp4']   = 'video/mp4'
+CORSRequestHandler.extensions_map['.m4s']   = 'video/iso.segment'
 
 if __name__ == '__main__':
     test(CORSRequestHandler, HTTPServer, bind='127.0.0.1', port=int(sys.argv[1]) if len(sys.argv) > 1 else 8000)
