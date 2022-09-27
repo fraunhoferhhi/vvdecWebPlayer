@@ -2,8 +2,8 @@
 
 This project only contains the JavaScript and HTML code to build a minimal WebAssembly based VVC
 Player for the web using the [VVdeC](https://github.com/fraunhoferhhi/vvdec) library. It can play
-raw VVC bitstreams or MP4 files. There is no audio support, since this sample code is primarily
-focused on the feasibility of decoding VVC in the browser.
+raw VVC bitstreams, MP4 files, or segmented MP4s delivered via DASH. There is no audio support,
+since this sample code is primarily focused on the feasibility of decoding VVC in the browser.
 
 The compiled VVdeC WebAssembly binary and emscripten support code are not included in this
 repository, but need to be built separately and copied into the `bin/` folder.
@@ -27,7 +27,10 @@ Copy the resulting files `vvdecapp.wasm`, `vvdecapp.worker.js`, and `vvdecapp.js
 ### Deploy to Webserver
 
 Edit the `bitstreams.json` file to include the VVC files you want to play and place them below this
-directory. The files can either be raw bitstreams or packaged as MP4-files.
+directory. The files can either be raw bitstreams, packaged as MP4-files, or DASH manifests. When
+using a raw bitstream or a single MP4 file, the file will be downloaded completely before
+playback, segmented MP4 files will be downloaded segment by segment as specified in the DASH
+manifest.
 
 For testing purposes a tiny script to run a Python webserver is included. Just run
 `wasm_test-server.py` using Python 3 from the current directory. This starts a very simple webserver
@@ -48,6 +51,8 @@ Also, the site must be accessed using HTTPS, if not running on localhost.
 * Safari currently does not provide multithreading support for WebAssembly (Oct. 2021).
 * (UHD decoding works in principle using VVdeC > 1.3.0, but is probably too slow for practical
   purposes.)
+* DASH playback is only very minimal: no support for DASH live manifests or using range requests for
+  segment download.
 
 ## License
 
