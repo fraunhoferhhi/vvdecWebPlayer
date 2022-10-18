@@ -60,6 +60,6 @@ Please see [LICENSE](./LICENSE) file for the terms of use of the contents of thi
 
 For more information, please contact: vvc@hhi.fraunhofer.de
 
-**Copyright (c) 2021 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.**
+**Copyright (c) 2021-2022 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.**
 
 **All rights reserved.**
