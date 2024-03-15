@@ -544,9 +544,11 @@ export default class VVCPlayer {
       this.canvas.style.height = displayH + 'px';
     }
 
+    const player = this;
     window.onresize = function () {
-      if (this.canvas.clientWidth <= displayW) {
-        this.canvas.style.height = (this.canvas.clientWidth * yH / yW) + 'px';
+      // this is only needed to adapt the video size, when not playing. When playing it will be fixed on the next draw call
+      if (player.playingStatus !== "play" && player.canvas.clientWidth <= displayW) {
+        player.canvas.style.height = (player.canvas.clientWidth * yH / yW) + 'px';
       }
     };
 
