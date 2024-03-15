@@ -15,6 +15,10 @@ repository, but need to be built separately and copied into the `bin/` folder.
 You need to build the VVdeC WebAssembly binary first. [Emscripten SDK](https://emscripten.org/) and
 [CMake](http://www.cmake.org/) should be installed at this point and included in the search PATH.
 
+**NOTE: Emscripten versions after 3.1.26 currently sometimes lead to deadlocks or crashes in the
+decoder, so please use version 3.1.26 for building VVdeC.**
+(Install like this: `emsdk install 3.1.26 && emsdk activate 3.1.26`)
+
 Clone the VVdeC repository from https://github.com/fraunhoferhhi/vvdec. Within the vvdec directory
 run:
 
