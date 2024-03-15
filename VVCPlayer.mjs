@@ -526,15 +526,26 @@ export default class VVCPlayer {
     }
   });
 
+  async toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      await canvas.requestFullscreen();
+    }
+    else {
+      await document.exitFullscreen();
+    }
+
+    this.needWebGlReinit = true;
+  }
+
   #setupScene(yW, yH, uvW, uvH, strideY, strideUV, bitDepth, bytesPerPixel) {
     if (!this.renderer) {
       this.camera.position.z = 1;
-      this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true });
+      this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true, depth: false });
       this.renderer.autoClear = false;
       this.renderer.setClearAlpha(0);    // so we can use renderer.clear() on stop to display the VVC logo background
     }
 
-    const useFixedSize = this.displaySizeFixed && this.vidTrackMaxW && this.vidTrackMaxH;
+    const useFixedSize = this.displaySizeFixed && !document.fullscreenElement && this.vidTrackMaxW && this.vidTrackMaxH;
     const displayW = useFixedSize ? this.vidTrackMaxW : yW;
     const displayH = useFixedSize ? this.vidTrackMaxH : yH;
 
@@ -542,11 +553,25 @@ export default class VVCPlayer {
     if (useFixedSize) {
       this.canvas.style.width = displayW + 'px';
       this.canvas.style.height = displayH + 'px';
+    } else if (document.fullscreenElement) {
+      const canvasAspect = this.canvas.clientWidth / this.canvas.clientHeight;
+      const videoAspect = yW / yH;
+
+      if (videoAspect < canvasAspect) {
+        this.canvas.style.height = '100%';
+        this.canvas.style.width = canvas.clientHeight * videoAspect + 'px';
+      }
+      else {
+        this.canvas.style.width = '100%';
+        this.canvas.style.height = canvas.clientWidth / videoAspect + 'px';
+      }
     }
 
+    const player = this;
     window.onresize = function () {
-      if (this.canvas.clientWidth <= displayW) {
-        this.canvas.style.height = (this.canvas.clientWidth * yH / yW) + 'px';
+      // this is only needed to adapt the video size, when not playing. When playing it will be fixed on the next draw call
+      if (player.playingStatus !== "play" && player.canvas.clientWidth <= displayW) {
+        player.canvas.style.height = (player.canvas.clientWidth * yH / yW) + 'px';
       }
     };
 
@@ -621,14 +646,17 @@ export default class VVCPlayer {
       this.#setupScene(yW, yH, uvW, uvH, strideY, strideUV, bitDepth, bytesPerPixel);
     }
 
-    const useFixedSize = this.displaySizeFixed && this.vidTrackMaxW && this.vidTrackMaxH;
     // update aspect ratio of renderer
-    if (Math.abs(this.canvas.clientWidth / this.canvas.clientHeight - yW / yH) > 0.01) {
-      this.renderer.setSize(yW, this.canvas.clientWidth * yH / yW, !useFixedSize);
+    const canvasAspect = this.canvas.clientWidth / this.canvas.clientHeight;
+    const videoAspect = yW / yH;
+    if (!document.fullscreenElement && Math.abs(canvasAspect - videoAspect) > 0.01) {
+      const useFixedSize = this.displaySizeFixed && !document.fullscreenElement && this.vidTrackMaxW && this.vidTrackMaxH;
+
+      this.renderer.setSize(yW, this.canvas.clientWidth / videoAspect, !useFixedSize);
 
       if (useFixedSize) {
         this.canvas.style.width = this.vidTrackMaxW + 'px';
-        this.canvas.style.height = this.canvas.clientWidth * yH / yW + 'px';
+        this.canvas.style.height = this.canvas.clientWidth / videoAspect + 'px';
       }
     }
 

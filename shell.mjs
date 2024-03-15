@@ -35,6 +35,7 @@ buttonIncR.onclick = incRendition;
 buttonPlay.onclick = play_pause;
 buttonStop.onclick = stop;
 videoWrapper.onclick = buttonPlay.onclick;
+videoWrapper.ondblclick = () => player.toggleFullScreen();
 bitstreamList.onchange = updateDownloadLink;
 
 
