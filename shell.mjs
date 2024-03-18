@@ -371,6 +371,10 @@ function handleEOF() {
     return true;    // return true to signal looping, so the player doesn't clear the screen
   }
 
+  if (document.fullscreenElement) {
+    player.toggleFullScreen();
+  }
+
   updateUIButtons();
   MeasureFPS.updateDisplay(true);
 }
